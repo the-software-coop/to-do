@@ -16,7 +16,8 @@
 				"karunamurti.tera"
 			]
 		}
-	}
+	},
+	"postCreateCommand": "apk add git"
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},

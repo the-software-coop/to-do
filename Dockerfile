@@ -1,6 +1,8 @@
-FROM rust
+FROM rust:alpine
 
 WORKDIR /code
+
+RUN apk add build-base
 
 COPY . /code/
 
