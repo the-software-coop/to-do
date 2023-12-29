@@ -20,6 +20,8 @@ jobs:
           file: ./Dockerfile
           tags: todo:latest
           outputs: type=docker,dest=/tmp/todo.tar
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
       - name: Upload image
         uses: actions/upload-artifact@v2
         with:
