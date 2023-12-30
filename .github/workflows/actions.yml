@@ -58,4 +58,4 @@ jobs:
       - name: Load Docker image
         run: docker load --input /tmp/todo.tar
       - name: Run chappy linting
-        run: docker run todo:latest sh -c "rustup component add clippy ; cargo clippy"
+        run: docker run todo:latest sh -c "rustup component add clippy ; cargo clippy --verbose"
