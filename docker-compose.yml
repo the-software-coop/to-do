@@ -1,0 +1,4 @@
+services:
+  todo:
+    build: .
+    network_mode: host
