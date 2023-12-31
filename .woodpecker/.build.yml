@@ -1,4 +1,10 @@
 steps:
+  lint:
+    image: rust
+    commands:
+      - rustup component add clippy
+      - cargo clippy --verbose
+
   test:
       image: rust
       commands:

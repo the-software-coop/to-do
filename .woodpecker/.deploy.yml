@@ -1,0 +1,16 @@
+steps:
+  deploy:
+      image: alpine
+      commands:
+        - docker compose up
+      volumes:
+        - /var/run/docker.sock:/var/run/docker.sock
+
+when:
+  - event: [push, manual]
+    #branch: main
+
+depends_on:
+  - lint
+  - test
+  - build
