@@ -9,8 +9,3 @@ steps:
 when:
   - event: [push, manual]
     #branch: main
-
-depends_on:
-  - lint
-  - test
-  - build
