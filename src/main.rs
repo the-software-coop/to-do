@@ -1,47 +1,86 @@
-use actix_web::{middleware, web, App, HttpRequest, HttpServer};
+use actix_web::{get, post, web, App, HttpServer, Responder, Result};
+use serde::{Deserialize, Serialize};
 
-async fn index(req: HttpRequest) -> &'static str {
-    println!("REQ: {req:?}");
-    "Hello world!"
+#[derive(Deserialize, Serialize)]
+struct Item {
+    id: i32,
+    text: String,
+    done: bool,
+}
+
+#[post("/item")]
+async fn post_item(item: web::Json<Item>) -> Result<impl Responder> {
+    Ok(web::Json(item))
+}
+
+#[get("/item/{id}")]
+async fn get_item(id: web::Path<String>) -> Result<impl Responder> {
+    let item = Item {
+        id: id.parse::<i32>().unwrap(),
+        text: "Finish this todo api".to_string(),
+        done: false,
+    };
+    Ok(web::Json(item))
 }
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
-
-    log::info!("starting HTTP server at http://localhost:8080");
-
-    HttpServer::new(|| {
-        App::new()
-            // enable logger
-            .wrap(middleware::Logger::default())
-            .service(web::resource("/index.html").to(|| async { "Hello world!" }))
-            .service(web::resource("/").to(index))
-    })
-    .bind(("127.0.0.1", 8080))?
-    .run()
-    .await
+    HttpServer::new(|| App::new().service(post_item).service(get_item))
+        .bind(("127.0.0.1", 8080))?
+        .run()
+        .await
 }
 
 #[cfg(test)]
 mod tests {
-    use actix_web::{body::to_bytes, dev::Service, http, test, web, App, Error};
+    use actix_web::{body::to_bytes, http, test, App};
 
     use super::*;
 
     #[actix_web::test]
-    async fn test_index() -> Result<(), Error> {
-        let app = App::new().route("/", web::get().to(index));
-        let app = test::init_service(app).await;
+    async fn test_post_item() {
+        let item = Item {
+            id: 1,
+            text: "Finish this todo api".to_string(),
+            done: false,
+        };
 
-        let req = test::TestRequest::get().uri("/").to_request();
-        let resp = app.call(req).await?;
+        let app = test::init_service(App::new().service(post_item)).await;
+
+        let req = test::TestRequest::post()
+            .uri("/item")
+            .set_json(&item)
+            .to_request();
+        let resp = test::call_service(&app, req).await;
+
+        assert!(resp.status().is_success());
+
+        let body_bytes = to_bytes(resp.into_body()).await.unwrap();
+        assert_eq!(
+            body_bytes,
+            actix_web::web::Bytes::from(serde_json::to_string(&item).unwrap())
+        );
+    }
+
+    #[actix_web::test]
+    async fn test_get_item() {
+        let item = Item {
+            id: 1,
+            text: "Finish this todo api".to_string(),
+            done: false,
+        };
+
+        let app = test::init_service(App::new().service(get_item)).await;
+
+        let req = test::TestRequest::get().uri("/item/1").to_request();
+        let resp = test::call_service(&app, req).await;
 
         assert_eq!(resp.status(), http::StatusCode::OK);
 
-        let response_body = resp.into_body();
-        assert_eq!(to_bytes(response_body).await?, r##"Hello world!"##);
-
-        Ok(())
+        let body_bytes = to_bytes(resp.into_body()).await.unwrap();
+        assert_eq!(
+            body_bytes,
+            actix_web::web::Bytes::from(serde_json::to_string(&item).unwrap())
+        );
     }
 }
