@@ -2,7 +2,7 @@ steps:
   deploy:
       image: docker
       commands:
-        - docker compose up -d
+        - docker compose up -d --network=host
       volumes:
         - /var/run/docker.sock:/var/run/docker.sock
 
