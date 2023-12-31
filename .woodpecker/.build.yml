@@ -1,0 +1,16 @@
+pipeline:
+  test:
+      image: rust
+      group: test
+      commands:
+        - cargo test
+
+  build:
+    image: rust
+    group: build
+    commands:
+      - cargo build --release
+
+when:
+  - event: [pull_request, manual]
+  - branch: main
