@@ -1,13 +1,13 @@
 steps:
   test:
       image: rust
-      group: test
+      depends_on: test
       commands:
         - cargo test
 
   build:
     image: rust
-    group: build
+    depends_on: build
     commands:
       - cargo build --release
 
