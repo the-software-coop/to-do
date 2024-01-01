@@ -14,9 +14,9 @@ async fn post_item(item: web::Json<Item>) -> Result<impl Responder> {
 }
 
 #[get("/item/{id}")]
-async fn get_item(id: web::Path<String>) -> Result<impl Responder> {
+async fn get_item(id: web::Path<i32>) -> Result<impl Responder> {
     let item = Item {
-        id: id.parse::<i32>().unwrap(),
+        id: *id,
         text: "Finish this todo api".to_string(),
         done: false,
     };
@@ -75,12 +75,25 @@ mod tests {
         let req = test::TestRequest::get().uri("/item/1").to_request();
         let resp = test::call_service(&app, req).await;
 
-        assert_eq!(resp.status(), http::StatusCode::OK);
+        assert!(resp.status().is_success());
 
         let body_bytes = to_bytes(resp.into_body()).await.unwrap();
         assert_eq!(
             body_bytes,
             actix_web::web::Bytes::from(serde_json::to_string(&item).unwrap())
         );
+    }
+
+    #[actix_web::test]
+    async fn test_get_item_id_must_be_int() {
+        let app = test::init_service(App::new().service(get_item)).await;
+
+        let req = test::TestRequest::get().uri("/item/qwe").to_request();
+        let resp = test::call_service(&app, req).await;
+
+        assert_eq!(resp.status(), http::StatusCode::NOT_FOUND);
+
+        let body_bytes = to_bytes(resp.into_body()).await.unwrap();
+        assert_eq!(body_bytes, "can not parse \"qwe\" to a i32");
     }
 }
