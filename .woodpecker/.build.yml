@@ -7,10 +7,10 @@ steps:
     failure: ignore
 
   test:
-      image: rust:alpine
-      commands:
-        - apk add libpq-dev 
-        - cargo test
+    image: rust:alpine
+    commands:
+      - apk add libpq-dev 
+      - cargo test
     failure: ignore
 
   build:
