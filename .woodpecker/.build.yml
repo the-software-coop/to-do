@@ -1,22 +1,22 @@
 steps:
   lint:
-    image: rust:alpine
+    image: rust
     commands:
       - rustup component add clippy
       - cargo clippy --verbose
     failure: ignore
 
   test:
-    image: rust:alpine
+    image: rust
     commands:
-      - apk add libpq-dev 
+      - apt install libpq-dev 
       - cargo test
     failure: ignore
 
   build:
-    image: rust:alpine
+    image: rust
     commands:
-      - apk add libpq-dev
+      - apt install libpq-dev 
       - cargo build --release
 
 when:
