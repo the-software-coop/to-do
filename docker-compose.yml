@@ -2,3 +2,14 @@ services:
   todo:
     build: .
     network_mode: host
+
+  database:
+    image: 'postgres:16.1-alpine3.19'
+    ports:
+      - 15432:5432
+    environment:
+      POSTGRES_PASSWORD: password
+    # volumes:
+    #   - ./db-data/:/var/lib/postgresql/data/
+    #   - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+

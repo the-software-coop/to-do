@@ -1,18 +1,20 @@
 steps:
   lint:
-    image: rust
+    image: rust:alpine
     commands:
       - rustup component add clippy
       - cargo clippy --verbose
 
   test:
-      image: rust
+      image: rust:alpine
       commands:
+        - apk add libpq-dev 
         - cargo test
 
   build:
-    image: rust
+    image: rust:alpine
     commands:
+      - apk add libpq-dev
       - cargo build --release
 
 when:
