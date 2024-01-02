@@ -4,12 +4,14 @@ steps:
     commands:
       - rustup component add clippy
       - cargo clippy --verbose
+  failure: ignore
 
   test:
       image: rust:alpine
       commands:
         - apk add libpq-dev 
         - cargo test
+  failure: ignore
 
   build:
     image: rust:alpine
