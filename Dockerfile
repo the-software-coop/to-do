@@ -1,9 +1,6 @@
-FROM rust:alpine
+FROM rust
 
 WORKDIR /code
-
-RUN apk add build-base
-RUN apk add libpq-dev
 
 COPY ./src /code/src
 COPY ./Cargo.toml /code/
