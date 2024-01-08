@@ -1,15 +1,13 @@
-FROM rust:alpine
+FROM rust
 
 WORKDIR /code
-
-RUN apk add build-base
 
 COPY ./src /code/src
 COPY ./Cargo.toml /code/
 
-RUN cargo build
+RUN cargo build --release
 
 COPY . /code/
 
 
-CMD ["cargo", "run"]
+CMD ["cargo", "run", "--release"]
