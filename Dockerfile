@@ -10,4 +10,4 @@ RUN cargo build --release
 COPY . /code/
 
 
-CMD ["cargo", "run"]
+CMD ["cargo", "run", "--release"]

@@ -29,7 +29,7 @@ async fn get_item(id: web::Path<i32>) -> Result<impl Responder> {
 async fn main() -> std::io::Result<()> {
     let pool = postgres::get_pool();
     HttpServer::new(move || App::new().app_data(web::Data::new(pool.clone())).service(post_item).service(get_item))
-        .bind(("127.0.0.1", 8080))?
+        .bind(("0.0.0.0", 8080))?
         .run()
         .await
 }
