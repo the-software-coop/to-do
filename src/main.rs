@@ -1,6 +1,8 @@
 use actix_web::{get, post, web, App, HttpServer, Responder, Result};
 use serde::{Deserialize, Serialize};
 
+mod postgres;
+
 #[derive(Deserialize, Serialize)]
 struct Item {
     id: i32,
@@ -25,8 +27,9 @@ async fn get_item(id: web::Path<i32>) -> Result<impl Responder> {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    HttpServer::new(|| App::new().service(post_item).service(get_item))
-        .bind(("127.0.0.1", 8080))?
+    let pool = postgres::get_pool();
+    HttpServer::new(move || App::new().app_data(web::Data::new(pool.clone())).service(post_item).service(get_item))
+        .bind(("0.0.0.0", 8080))?
         .run()
         .await
 }

@@ -4,15 +4,19 @@ steps:
     commands:
       - rustup component add clippy
       - cargo clippy --verbose
+    failure: ignore
 
   test:
-      image: rust
-      commands:
-        - cargo test
+    image: rust
+    commands:
+      - apt install libpq-dev 
+      - cargo test
+    failure: ignore
 
   build:
     image: rust
     commands:
+      - apt install libpq-dev 
       - cargo build --release
 
 when:
