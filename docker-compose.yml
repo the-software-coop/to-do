@@ -3,11 +3,13 @@ services:
     build: .
     ports:
       - 8080:8080
+    depends_on:
+      - database
 
   database:
     image: 'postgres:16.1-alpine3.19'
     ports:
-      - 15432:5432
+      - 5432:5432
     environment:
       POSTGRES_PASSWORD: password
     # volumes:
