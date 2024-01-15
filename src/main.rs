@@ -1,7 +1,9 @@
-use actix_web::{get, post, web, App, HttpServer, Responder, Result};
+use actix_web::{get, post, web, web::Data, App, HttpServer, Responder, Result};
 use serde::{Deserialize, Serialize};
-
-mod postgres;
+use sqlx::{postgres::PgPoolOptions, Pool, Postgres};
+pub struct AppState {
+    db: Pool<Postgres>,
+}
 
 #[derive(Deserialize, Serialize)]
 struct Item {
@@ -27,11 +29,21 @@ async fn get_item(id: web::Path<i32>) -> Result<impl Responder> {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    let pool = postgres::get_pool();
-    HttpServer::new(move || App::new().app_data(web::Data::new(pool.clone())).service(post_item).service(get_item))
-        .bind(("0.0.0.0", 8080))?
-        .run()
+    let pool = PgPoolOptions::new()
+        .max_connections(5)
+        .connect("postgres://postgres:password@database:5432")
         .await
+        .expect("Error building a connection pool");
+
+    HttpServer::new(move || {
+        App::new()
+            .app_data(Data::new(AppState { db: pool.clone() }))
+            .service(post_item)
+            .service(get_item)
+    })
+    .bind(("0.0.0.0", 8080))?
+    .run()
+    .await
 }
 
 #[cfg(test)]
